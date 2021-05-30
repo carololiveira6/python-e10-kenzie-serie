@@ -49,3 +49,21 @@ class SeriesTable:
         result['serie', 'gender'] = result['serie', 'gender'].title()
 
         return result
+
+    def return_data(self):
+        conn, cur = conn_cur()
+
+        cur.execute("SELECT * FROM ka_series")
+
+        query = cur.fetchall()
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        result = [dict(zip(self.table_header, show_table)) for show_table in query]
+
+        for data in result:
+            data['serie', 'gender'] = data['serie', 'gender'].title()
+
+        return result
