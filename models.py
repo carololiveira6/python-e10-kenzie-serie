@@ -1,1 +1,4 @@
-from .services.services import conn_cur
+from app.services.services import conn_cur
+
+class TabelaSeries:
+      
