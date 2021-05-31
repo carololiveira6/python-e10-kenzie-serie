@@ -1,4 +1,4 @@
-from ..services.services import conn_cur
+from ..services.services import conn_cur, finalize_conn_cur
 
 class SeriesTable:
     table_header = ['id', 'serie', 'seasons', 'released_date', 'genre', 'imdb_rating']
@@ -20,10 +20,8 @@ class SeriesTable:
             """
         )
 
-        conn.commit()
-        cur.close()
-        conn.close()
-
+        finalize_conn_cur(conn, cur)
+        
     def create_serie(self, data: dict):
         conn, cur = conn_cur()
         self._create_table()
@@ -40,9 +38,7 @@ class SeriesTable:
         )
         query = cur.fetchone()
 
-        conn.commit()
-        cur.close()
-        conn.close()
+        finalize_conn_cur(conn, cur)
 
         result = dict(zip(self.table_header, query))
 
@@ -53,17 +49,35 @@ class SeriesTable:
     def return_data(self):
         conn, cur = conn_cur()
 
+        SeriesTable._create_table()
+
         cur.execute("SELECT * FROM ka_series")
 
+        #.fetchall(): busca todas as linhas de um resultado de consulta e retorna todas as linhas como uma lista de tuplas; uma lista vazia é retornada se não houver nenhum registro para buscar.
         query = cur.fetchall()
 
-        conn.commit()
-        cur.close()
-        conn.close()
+        finalize_conn_cur(conn, cur)
 
         result = [dict(zip(self.table_header, show_table)) for show_table in query]
 
         for data in result:
             data['serie', 'gender'] = data['serie', 'gender'].title()
 
-        return result
+        return result, 200
+
+    def select_id(self):
+        conn, cur = conn_cur()
+
+        if SeriesTable._create_table():
+            return {}, 404
+
+        cur.execute("SELECT id FROM ka_series")
+
+        query = cur.fetchall()
+
+        finalize_conn_cur(conn, cur)
+
+        result = dict(zip(self.table_header, query))
+
+        return result, 200
+        

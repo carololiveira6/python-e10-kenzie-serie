@@ -17,3 +17,8 @@ def conn_cur():
     cur = conn.cursor()
 
     return (conn, cur,)
+
+def finalize_conn_cur(conn, cur) -> None:
+    conn.commit()
+    cur.close()
+    conn.close()
