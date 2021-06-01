@@ -53,7 +53,8 @@ class SeriesTable:
     def return_data(self):
         conn, cur = conn_cur()
 
-        SeriesTable._create_table(self)
+        if SeriesTable._create_table(self) == False:
+            return []
 
         cur.execute("SELECT * FROM ka_series")
 
@@ -71,19 +72,19 @@ class SeriesTable:
 
         return result
 
-    def select_id(self):
+    def select_id(self, serie_id):
         conn, cur = conn_cur()
 
-        if SeriesTable.return_data(self) == {}:
-            return {}, 404
+        try:
+            cur.execute("SELECT * FROM ka_series WHERE id = %(serie_id)s", {"serie_id": serie_id})
 
-        cur.execute("SELECT id FROM ka_series")
+            query = cur.fetchone()
 
-        query = cur.fetchall()
+            finalize_conn_cur(conn, cur)
 
-        finalize_conn_cur(conn, cur)
-
-        result = dict(zip(self.table_header, query))
-
-        return result
-        
+            result = dict(zip(self.table_header, query))
+    
+            return {"data": result}
+        except:
+            SeriesTable._create_table(self)
+            return {"error": "Not Found"}, 404

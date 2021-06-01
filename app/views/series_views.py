@@ -3,7 +3,6 @@ from ..services.models_services import SeriesTable
 
 bp_series_views = Blueprint('series', __name__, url_prefix='/api')
 
-
 @bp_series_views.route('/series', methods=['POST'])
 def create():
     series = SeriesTable()
@@ -18,7 +17,7 @@ def series():
     return jsonify({"data": series.return_data()})
 
 @bp_series_views.route('/series/<int:serie_id>', methods=['GET'])
-def select_by_id():
+def select_by_id(serie_id):
     series = SeriesTable()
 
-    return jsonify(series.select_id())
+    return series.select_id(serie_id)
