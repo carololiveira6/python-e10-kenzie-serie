@@ -1,4 +1,5 @@
-from ..services.services import conn_cur, finalize_conn_cur
+from flask.json import jsonify
+from .service_services import conn_cur, finalize_conn_cur
 
 class SeriesTable:
     table_header = ['id', 'serie', 'seasons', 'released_date', 'genre', 'imdb_rating']
@@ -26,12 +27,15 @@ class SeriesTable:
         conn, cur = conn_cur()
         self._create_table()
 
+        data['serie'] = data['serie'].title()
+        data['genre'] = data['genre'].title()
+
         cur.execute(
             """
-                INSERT TO ka_series
-                    (id, serie, seasons, released_date, genre, imdb_rating)
+                INSERT INTO ka_series
+                    (serie, seasons, released_date, genre, imdb_rating)
                 VALUES
-                    (%(id)s, %(serie)s, %(seasons)s, %(released_date)s, %(genre)s, %(imdb_rating)s)
+                    (%(serie)s, %(seasons)s, %(released_date)s, %(genre)s, %(imdb_rating)s)
                 RETURNING *
             """,
             data,
@@ -42,14 +46,14 @@ class SeriesTable:
 
         result = dict(zip(self.table_header, query))
 
-        result['serie', 'gender'] = result['serie', 'gender'].title()
+        result["released_date"] = result["released_date"].strftime("%d/%m/%Y")
 
         return result
 
     def return_data(self):
         conn, cur = conn_cur()
 
-        SeriesTable._create_table()
+        SeriesTable._create_table(self)
 
         cur.execute("SELECT * FROM ka_series")
 
@@ -61,14 +65,16 @@ class SeriesTable:
         result = [dict(zip(self.table_header, show_table)) for show_table in query]
 
         for data in result:
-            data['serie', 'gender'] = data['serie', 'gender'].title()
+            data["released_date"] = data["released_date"].strftime("%d/%m/%Y")
 
-        return result, 200
+        # result_dict = {data: result_list for data, result_list in enumerate(result)}
+
+        return result
 
     def select_id(self):
         conn, cur = conn_cur()
 
-        if SeriesTable._create_table():
+        if SeriesTable.return_data(self) == {}:
             return {}, 404
 
         cur.execute("SELECT id FROM ka_series")
@@ -79,5 +85,5 @@ class SeriesTable:
 
         result = dict(zip(self.table_header, query))
 
-        return result, 200
+        return result
         

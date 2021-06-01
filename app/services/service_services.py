@@ -2,7 +2,6 @@ import psycopg2
 from environs import Env
 
 env = Env()
-env.read_venv()
 
 #conexão com banco de dados
 def conn_cur():
